@@ -1,0 +1,8 @@
+{
+    "host": "localhost",
+    "port": "5434",
+    "username": "ms",
+    "Password": "qwerty",
+    "DBName": "blog",
+    "SSLMode": "disable"
+}

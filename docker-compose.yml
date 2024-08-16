@@ -1,0 +1,10 @@
+version: '3.9'
+services:
+  psql:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ms
+      POSTGRES_PASSWORD: qwerty
+      POSTGRES_DB: blog
+    ports:
+      - '5434:5432'
