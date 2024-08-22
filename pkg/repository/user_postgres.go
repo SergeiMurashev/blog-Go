@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"github.com/SergeiMurashev/blog-app/pkg/models"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
@@ -30,11 +29,9 @@ func (r *UserPostgres) CreateUser(user models.UserInputCreate) (*models.User, er
 	return &output, err
 }
 
-// ошибочка
-func (r *UserPostgres) GetUser(username, password string) (*models.User, error) {
+func (r *UserPostgres) GetUser(email string) (*models.User, error) {
 	var user models.User
-	query := fmt.Sprintf("SELECT id FROM %s WHERE email=$1 AND password_hash=$2", usersTable)
-	err := r.db.Get(&user, query, username, password)
+	err := r.db.Get(&user, `SELECT * FROM "Users" WHERE email=$1`, email)
 
-	return user, err
+	return &user, err
 }

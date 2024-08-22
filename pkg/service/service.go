@@ -9,12 +9,13 @@ type Post interface {
 	CreatePost(post models.PostInputCreate) (*models.Post, error)
 	DeletePost(post models.PostInputDelete) error
 	UpdatePost(post models.PostInputUpdate) (*models.Post, error)
+	UserAuthorPost(email string, postID int) (bool, error)
 }
 
 type User interface {
 	CreateUser(user models.UserInputCreate) (*models.User, error)
-	GenerateToken(email, password string) (string, error)
-	ParseToken(token string) (int, error)
+	Authorization(email, password string) (*models.AuthorizationOutput, error)
+	ParseToken(token string) (string, error)
 }
 
 type Comment interface {

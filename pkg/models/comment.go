@@ -11,7 +11,7 @@ type Comment struct {
 }
 
 type CommentInputCreate struct {
-	Text        string `json:"text"`
+	Text        string `json:"text" binding:"required"`
 	Create_date string `json:"create_date"`
 	Author      string `json:"author"`
 	Post        int    `json:"post"`

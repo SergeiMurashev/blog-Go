@@ -7,13 +7,14 @@ import (
 
 type User interface {
 	CreateUser(user models.UserInputCreate) (*models.User, error)
-	GetUser(email, password string) (*models.User, error)
+	GetUser(email string) (*models.User, error)
 }
 
 type Post interface {
 	CreatePost(post models.PostInputCreate) (*models.Post, error)
 	DeletePost(post models.PostInputDelete) error
 	UpdatePost(post models.PostInputUpdate) (*models.Post, error)
+	UserAuthorPost(email string, postID int) (bool, error)
 }
 type Comment interface {
 	CreateComment(comment models.CommentInputCreate) (*models.Comment, error)

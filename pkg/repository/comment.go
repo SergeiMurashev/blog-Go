@@ -48,3 +48,5 @@ func (r *CommentPostgres) UpdateComment(comment models.CommentInputUpdate) (*mod
 	}
 	return &output, nil
 }
+
+//дописать проверку на ред комента

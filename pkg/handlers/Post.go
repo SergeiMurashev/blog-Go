@@ -14,7 +14,8 @@ func (h *Handler) createPost(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
-
+	email := h.GetUser(c)
+	input.Author = email
 	post, err := h.services.Post.CreatePost(input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())

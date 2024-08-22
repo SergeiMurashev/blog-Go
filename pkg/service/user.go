@@ -1,14 +1,21 @@
 package service
 
 import (
-	"crypto/sha1"
-	"fmt"
+	"crypto/sha512"
+	"encoding/hex"
+	"errors"
 	"github.com/SergeiMurashev/blog-app/pkg/models"
 	"github.com/SergeiMurashev/blog-app/pkg/repository"
+	"github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
+	"math/rand"
+	"sync"
 	"time"
 )
 
-const salt = "hewfswq124617khgfrwb"
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+var session = sync.Map{}
 
 type UserService struct {
 	repo repository.User
@@ -19,69 +26,70 @@ func NewUserService(repo repository.User) *UserService {
 }
 
 func (s *UserService) CreateUser(user models.UserInputCreate) (*models.User, error) {
-	user.Password = s.generatePasswordHash(user.Password)
+	user.Password = getPasswordHash(user.Password)
 	return s.repo.CreateUser(user)
 }
 
-const (
-	salt       = "hjqrhjqw124617ajfhajs"
-	signingKey = "qrkjk#4#%35FSFJlja#4353KSFjH"
-	tokenTTL   = 12 * time.Hour
-)
-
-// устоновить JWT
-type tokenClaims struct {
-	jwt.StandardClaims
-	UserId int `json:"user_id"`
-}
-
-func (s *UserService) GenerateToken(email, password string) (string, error) {
-	user, err := s.repo.GetUser(email, generatePasswordHash(password))
+func getPasswordHash(password string) string {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return "", err
+		logrus.Error(err.Error())
+		return ""
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
-			IssuedAt:  time.Now().Unix(),
-		},
-		user.Id,
-	})
-
-	return token.SignedString([]byte(signingKey))
+	return string(hash)
 }
 
-func (s *AuthService) ParseToken(accessToken string) (int, error) {
-	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("invalid signing method")
-		}
-
-		return []byte(signingKey), nil
-	})
+func (s *UserService) Authorization(email, password string) (*models.AuthorizationOutput, error) {
+	account, err := s.repo.GetUser(email)
 	if err != nil {
-		return 0, err
+		logrus.Error(err.Error())
+		return nil, err
 	}
+	err = comparePasswords(account.Password, password)
+	if err != nil {
+		logrus.Error(err.Error())
+		return nil, err
+	}
+	token := s.GenerateToken(email)
+	var accountOutput = models.UserOutput{
+		Name:        account.Name,
+		Email:       account.Email,
+		Create_date: account.Create_date,
+	}
+	var output = models.AuthorizationOutput{
+		User:  accountOutput,
+		Token: token,
+	}
+	return &output, nil
+}
 
-	claims, ok := token.Claims.(*tokenClaims)
+func comparePasswords(hash string, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+}
+
+func (s *UserService) GenerateToken(email string) string {
+	token := generateToken()
+	session.Store(token, email)
+	return token
+}
+
+func (s *UserService) ParseToken(accessToken string) (string, error) {
+	email, ok := session.Load(accessToken)
 	if !ok {
-		return 0, errors.New("token claims are not of type *tokenClaims")
+		logrus.Warnf("err auth")
+		return "", errors.New("err auth")
 	}
-
-	return claims.UserId, nil
+	return email.(string), nil
 }
 
-func generatePasswordHash(password string) string {
-	hash := sha1.New()
-	hash.Write([]byte(password))
-
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
-}
-
-func (s *UserService) generatePasswordHash(password string) string {
-	hash := sha1.New()
-	hash.Write([]byte(password))
-
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+func generateToken() string {
+	rand.Seed(time.Now().UnixNano())
+	b := make([]rune, 1024)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	s := sha512.New()
+	s.Write([]byte(string(b)))
+	return hex.EncodeToString(s.Sum(nil))
 }

@@ -11,8 +11,8 @@ type Post struct {
 }
 
 type PostInputCreate struct {
-	Title       string `json:"title"`
-	Text        string `json:"text"`
+	Title       string `json:"title" binding:"required"`
+	Text        string `json:"text"  binding:"required"`
 	Create_date string `json:"create_date"`
 	Author      string `json:"author"`
 }
@@ -25,4 +25,8 @@ type PostInputUpdate struct {
 
 type PostInputDelete struct {
 	Id int `json:"id"`
+}
+type PostInputCheck struct {
+	Id     int    `json:"id"`
+	Author string `json:"author"`
 }

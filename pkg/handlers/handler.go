@@ -24,7 +24,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			user.POST("/sign-in", h.signIn)
 		}
 
-		Posts := api.Group("/posts")
+		Posts := api.Group("/posts", h.userIdentity)
 		{
 			Posts.POST("", h.createPost)
 			Posts.PUT("/:id", h.updatePost)

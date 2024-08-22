@@ -50,3 +50,13 @@ func (r *PostPostgres) UpdatePost(post models.PostInputUpdate) (*models.Post, er
 	}
 	return &output, nil
 }
+
+func (r *PostPostgres) UserAuthorPost(email string, postID int) (bool, error) {
+	var exist bool
+	err := r.db.Get(&exist, `SELECT EXISTS(select * FROM "Post" WHERE id = $1, AND public."Post".author = $2)`, postID, email)
+	if err != nil {
+		logrus.Error(err.Error())
+		return false, err
+	}
+	return exist, nil
+}

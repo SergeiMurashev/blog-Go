@@ -24,3 +24,7 @@ func (s *PostService) CreatePost(post models.PostInputCreate) (*models.Post, err
 func (s *PostService) DeletePost(post models.PostInputDelete) error {
 	return s.repo.DeletePost(post)
 }
+
+func (s *PostService) UserAuthorPost(email string, postID int) (bool, error) {
+	return s.repo.UserAuthorPost(email, postID)
+}
