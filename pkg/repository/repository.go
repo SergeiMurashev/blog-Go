@@ -20,6 +20,7 @@ type Comment interface {
 	CreateComment(comment models.CommentInputCreate) (*models.Comment, error)
 	DeleteComment(comment models.CommentInputDelete) error
 	UpdateComment(comment models.CommentInputUpdate) (*models.Comment, error)
+	UserAuthorComment(email string, commentID int) (bool, error)
 }
 
 type Repository struct {

@@ -39,7 +39,8 @@ func (h *Handler) updateComment(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
 		return
 	}
-	output, err := h.services.Comment.UpdateComment(input)
+	email := h.GetUser(c)
+	output, err := h.services.Comment.UpdateComment(input, email)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

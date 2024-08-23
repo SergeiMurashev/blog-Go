@@ -49,4 +49,13 @@ func (r *CommentPostgres) UpdateComment(comment models.CommentInputUpdate) (*mod
 	return &output, nil
 }
 
-//дописать проверку на ред комента
+func (r *CommentPostgres) UserAuthorComment(email string, commentID int) (bool, error) {
+	var exist bool
+	query := `SELECT EXISTS(SELECT 1 FROM "Comment" WHERE id = $1 AND author = $2)`
+	err := r.db.Get(&exist, query, commentID, email)
+	if err != nil {
+		logrus.WithError(err).Error("Error checking if user is the author of the comment")
+		return false, err
+	}
+	return exist, nil
+}

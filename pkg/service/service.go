@@ -7,8 +7,8 @@ import (
 
 type Post interface {
 	CreatePost(post models.PostInputCreate) (*models.Post, error)
-	DeletePost(post models.PostInputDelete) error
-	UpdatePost(post models.PostInputUpdate) (*models.Post, error)
+	DeletePost(post models.PostInputDelete, email string) error
+	UpdatePost(post models.PostInputUpdate, email string) (*models.Post, error)
 	UserAuthorPost(email string, postID int) (bool, error)
 }
 
@@ -20,8 +20,9 @@ type User interface {
 
 type Comment interface {
 	CreateComment(comment models.CommentInputCreate) (*models.Comment, error)
-	DeleteComment(comment models.CommentInputDelete) error
-	UpdateComment(comment models.CommentInputUpdate) (*models.Comment, error)
+	DeleteComment(comment models.CommentInputDelete, email string) error
+	UpdateComment(comment models.CommentInputUpdate, email string) (*models.Comment, error)
+	UserAuthorComment(email string, commentID int) (bool, error)
 }
 
 type Service struct {

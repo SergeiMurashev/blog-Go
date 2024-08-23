@@ -25,3 +25,8 @@ type CommentInputUpdate struct {
 type CommentInputDelete struct {
 	Id int `json:"id"`
 }
+
+type CommentInputCheck struct {
+	Id     int    `json:"id"`
+	Author string `json:"author"`
+}
