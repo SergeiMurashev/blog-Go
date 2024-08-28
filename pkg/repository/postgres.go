@@ -6,6 +6,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// Конфиг, хранит настройки к подключению БД
 type Config struct {
 	Host     string
 	Port     string
@@ -15,6 +16,7 @@ type Config struct {
 	SSLMode  string
 }
 
+// Создает подключение к БД Postgres
 func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
 	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.Username, cfg.DBName, cfg.Password, cfg.SSLMode))
