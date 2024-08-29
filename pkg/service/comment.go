@@ -37,7 +37,7 @@ func (s *CommentService) UpdateComment(comment models.CommentInputUpdate, email 
 	// Проверка существования коммента. Вызывается метод s.repo, проверяет сущ ли коммент с указанным id и принадлежит ли он юзеру с данным email
 	// Exest (от слова exists - существовать)- переменная, bool'евого типа, то есть true если коммент с id есть и его email, то правда. Если юзер не от коммента, то false.
 	// Для понятности можно вместо exest написать isAuthor.
-	exest, err := s.repo.UserAuthorComment(email, comment.Id)
+	isExist, err := s.repo.UserAuthorComment(email, comment.Id)
 	if err != nil {
 		// Если возникла ошибка при проверке, записываем ее в лог и возвращаем ошибку
 		// Log - диагностика и отладка (позволяют понять что происходит внутри)
@@ -45,7 +45,7 @@ func (s *CommentService) UpdateComment(comment models.CommentInputUpdate, email 
 		return nil, err
 	}
 	// если коммент принадлежит пользователю, обновляем его.
-	if exest {
+	if isExist {
 		return s.repo.UpdateComment(comment)
 	} else {
 		// Если комментарий не его, возвращаем ошибку.

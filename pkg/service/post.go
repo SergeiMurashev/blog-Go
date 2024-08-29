@@ -18,14 +18,14 @@ func (s *PostService) UpdatePost(post models.PostInputUpdate, email string) (*mo
 	// Проверка существования поста. Вызывается метод s.repo, проверяет сущ ли пост с указанным id и принадлежит ли он юзеру с данным email
 	// Exest (от слова exists - существовать)- переменная, bool'евого типа, то есть true если коммент с id есть и его email, то правда. Если юзер не он коммента, то false.
 	// Для понятности можно вместо exest написать isAuthor.
-	exest, err := s.repo.UserAuthorPost(email, post.Id)
+	isExist, err := s.repo.UserAuthorPost(email, post.Id)
 	if err != nil {
 		// Если возникла ошибка при проверке, записываем ее в лог и возвращаем ошибку
 		logrus.Error(err.Error())
 		return nil, err
 	}
 	// если коммент принадлежит пользователю, обновляем его
-	if exest {
+	if isExist {
 		return s.repo.UpdatePost(post)
 	} else {
 		// Если комментарий не его, возвращаем ошибку.
@@ -44,12 +44,12 @@ func (s *PostService) CreatePost(post models.PostInputCreate) (*models.Post, err
 }
 
 // метод для обновления комментария - DeletePost, для струткуры - PostService.
-// аргументы - post объект типа models.PostInputDelete - содержит данные для обновления, email - юзер чей коммент.
+// аргументы - post объект типа models.PostInputDelete - содержит данные для удаления, email - юзер чей коммент.
 func (s *PostService) DeletePost(post models.PostInputDelete, email string) error {
 	// Проверка существования поста. Вызывается метод s.repo, проверяет сущ ли пост с указанным id и принадлежит ли он юзеру с данным email
 	// Exest (от слова exists - существовать)- переменная, bool'евого типа, то есть true если коммент с id есть и его email, то правда. Если юзер не он коммента, то false.
 	// Для понятности можно вместо exest написать isAuthor.
-	exest, err := s.repo.UserAuthorPost(email, post.Id)
+	isAuthor, err := s.repo.UserAuthorPost(email, post.Id)
 	if err != nil {
 		// Если возникла ошибка при проверке, записываем ее в лог и возвращаем ошибку
 		// Log - диагностика и отладка (позволяют понять что происходит внутри)
@@ -57,7 +57,7 @@ func (s *PostService) DeletePost(post models.PostInputDelete, email string) erro
 		return err
 	}
 	// если пост принадлежит пользователю, удаляем его.
-	if exest {
+	if isAuthor {
 		return s.repo.DeletePost(post)
 	} else {
 		// если нет, то возвращаем ошибку.
