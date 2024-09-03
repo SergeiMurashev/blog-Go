@@ -12,6 +12,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Для запуска через контейнер docker-compose up --build blog-app
+// Порт на локалке 5434 но если из контейнера ?
+
 func main() {
 	// Настраиваем формат логов в формате JSON
 	logrus.SetFormatter(new(logrus.JSONFormatter))
